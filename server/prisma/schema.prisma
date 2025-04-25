@@ -47,6 +47,7 @@ model Job {
   qualifications   String
   requirements     String
   responsibilities String
+  vacancy          Int
 
   shift String?
 
