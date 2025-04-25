@@ -6,12 +6,14 @@ import httpStatus from "http-status";
 
 const registerUser = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthServices.registerUser(req.body);
+
   res.cookie("token", result.token, { httpOnly: true });
+  
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "User Registered successfully!",
-    data: result.data,
+    data: result,
   });
 });
 

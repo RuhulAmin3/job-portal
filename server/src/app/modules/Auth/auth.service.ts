@@ -19,7 +19,7 @@ const registerUser = async (payload: User) => {
       `User with this email ${payload.email} already exists`
     );
   }
-  
+
   const hashedPassword: string = await bcrypt.hash(
     payload.password,
     Number(config.bcrypt_salt_rounds)
@@ -38,7 +38,9 @@ const registerUser = async (payload: User) => {
     config.jwt.jwt_secret as Secret,
     config.jwt.expires_in as string
   );
-  return { data: result, token: accessToken };
+  const { password, ...restData } = result;
+
+  return { data: restData, token: accessToken };
 };
 
 // user login
@@ -88,7 +90,14 @@ const getMyProfile = async (userToken: string) => {
       id: decodedToken.id,
     },
   });
-  return userProfile;
+
+  if (!userProfile) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User profile not found");
+  }
+
+  const { password, ...restData } = userProfile;
+
+  return restData;
 };
 
 // change password
@@ -165,7 +174,6 @@ const forgotPassword = async (payload: { email: string }) => {
           
           <p>Thank you,<br>Dream 2 Drive</p>
 </div>
-
       `
   );
   return { message: "Reset password link sent via your email successfully" };
@@ -200,6 +208,7 @@ const resetPassword = async (token: string, payload: { password: string }) => {
       password,
     },
   });
+
   return { message: "Password reset successfully" };
 };
 

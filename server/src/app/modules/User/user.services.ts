@@ -42,11 +42,11 @@ const getUsersFromDb = async (params: IParams, options: IPaginationOptions) => {
     orderBy:
       options.sortBy && options.sortOrder
         ? {
-            [options.sortBy]: options.sortOrder,
-          }
+          [options.sortBy]: options.sortOrder,
+        }
         : {
-            createdAt: "desc",
-          },
+          createdAt: "desc",
+        },
   });
   const total = await prisma.user.count({
     where: whereConditons,
@@ -93,11 +93,12 @@ const updateProfile = async (id: string, payload: Partial<User>) => {
       "Failed to update user profile"
     );
 
-  return result;
+  const { password, ...restData } = result;
+
+  return restData;
 };
 
 // get user
-
 const getUserById = async (id: string): Promise<User> => {
   const user = await prisma.user.findUnique({
     where: { id },

@@ -8,145 +8,56 @@ datasource db {
 }
 
 model User {
-  id            String  @id @default(auto()) @map("_id") @db.ObjectId
-  first_name    String?
-  last_name     String?
-  email         String  @unique
-  phone_number  String?
-  profile_image String?
-  password      String
-  address       String?
-  country       String?
-  city          String?
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  first_name String
+  last_name  String
+  email      String  @unique
+  password   String
 
   role UserRole @default(USER)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  bookings Booking[]
-
-  reviews review[]
-
   @@map("users")
 }
 
-model Room {
-  id               String          @id @default(auto()) @map("_id") @db.ObjectId
-  title            String
-  images           String[]
-  duration         Int             @default(60)
-  difficulty_level DifficultyLevel
-  min_player       Int             @default(1)
-  max_player       Int
-  booking_amount   Int
-  faq              faqType[]
-  description      String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  slots Slot[]
-
-  bookings Booking[]
-
-  reviews review[]
-
-  @@map("rooms")
-}
-
-model Slot {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  roomId     String   @db.ObjectId
-  date       DateTime
-  day        Week
-  room       Room     @relation(fields: [roomId], references: [id])
-  isBooked   Boolean  @default(false)
-  start_time String
-  end_time   String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  bookings Booking[]
-
-  @@map("slots")
-}
-
-model Booking {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  paymentId     String
-  first_name    String
-  last_name     String
-  email         String
-  phone_number  String
-  address       String
-  country       String
-  city          String
-  total_players Int
-  total_amount  Int
-  date          DateTime
-  method        PaymentMethod
-  status        BookingStatus @default(PENDING)
-
-  userId String @db.ObjectId
-  roomId String @db.ObjectId
-  slotId String @db.ObjectId
-
-  user User @relation(fields: [userId], references: [id])
-  room Room @relation(fields: [roomId], references: [id])
-  slot Slot @relation(fields: [slotId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("bookings")
-}
-
-model review {
+model Category {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  roomId    String   @db.ObjectId
-  room      Room     @relation(fields: [roomId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
-  rating    Int
-  comment   String
+  title     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("reviews")
+  job Job[]
+
+  @@map("job_categories")
 }
 
-enum BookingStatus {
-  PENDING
-  APPROVED
-  CANCELLED
+model Job {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  job_category_id String @unique @db.ObjectId()
+
+  job_category Category @relation(fields: [job_category_id], references: [id])
+
+  deadline         String
+  type             JobType @default(FULL_TIME)
+  level            String?
+  salary           String
+  qualifications   String
+  requirements     String
+  responsibilities String
+
+  shift String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-enum PaymentMethod {
-  CASH
-  CREDIT_CARD
-}
-
-type faqType {
-  question String
-  answer   String
-}
-
-enum Week {
-  SATURDAY
-  SUNDAY
-  MONDAY
-  TUESDAY
-  WEDNESDAY
-  THURSDAY
-  FRIDAY
-}
-
-enum DifficultyLevel {
-  EASY
-  MEDIUM
-  HARD
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
 }
 
 enum UserRole {
